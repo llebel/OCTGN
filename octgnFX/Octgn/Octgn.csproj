@@ -297,6 +297,7 @@
       <DependentUpon>ContactList.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\ControlTemplates\UserListItem.cs" />
+    <Compile Include="Controls\GlassBorder.cs" />
     <Compile Include="Controls\WindowDecorator.cs" />
     <Compile Include="Controls\IgnoreListItem.xaml.cs">
       <DependentUpon>IgnoreListItem.xaml</DependentUpon>
@@ -307,7 +308,6 @@
     <Compile Include="Controls\MissedMessagesBreak.xaml.cs">
       <DependentUpon>MissedMessagesBreak.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Controls\OctgnChrome2.cs" />
     <Compile Include="Controls\SubscribeMessageLargeMessage.xaml.cs">
       <DependentUpon>SubscribeMessageLargeMessage.xaml</DependentUpon>
     </Compile>
@@ -333,8 +333,8 @@
       <DependentUpon>HostGameSettings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\WindowDecorators\OctgnDecorator_2.cs" />
-    <Compile Include="Controls\WindowFrame.xaml.cs">
-      <DependentUpon>WindowFrame.xaml</DependentUpon>
+    <Compile Include="Controls\WindowDecorators\OctgnDecorator_2_Frame.xaml.cs">
+      <DependentUpon>OctgnDecorator_2_Frame.xaml</DependentUpon>
     </Compile>
     <Compile Include="Controls\WindowDecorators\NativeDecorator.cs" />
     <Compile Include="Controls\WindowDecorators\OctgnDecorator.cs" />
@@ -686,8 +686,10 @@
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>DoVersionStuff.txt</LastGenOutput>
     </None>
-    <Resource Include="Resources\Entypo.otf" />
     <None Include="Properties\SlowCheetah\SlowCheetah.Transforms.targets" />
+    <Resource Include="Resources\materialdesignicons-webfont.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Resource>
     <None Include="Scripting\GameEvents.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
       <LastGenOutput>GameEvents.cs</LastGenOutput>
@@ -733,13 +735,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
     <Content Include="Resources\knockknock.wav" />
-    <Resource Include="Resources\IconMenu\menu48.png" />
-    <Resource Include="Resources\IconMenu\chat60.png" />
-    <Resource Include="Resources\IconMenu\man440.png" />
-    <Resource Include="Resources\IconMenu\play87.png" />
-    <Resource Include="Resources\IconMenu\analogic4.png" />
-    <Resource Include="Resources\IconMenu\games33.png" />
-    <Resource Include="Resources\IconMenu\personal29.png" />
     <Resource Include="Resources\backtile.png" />
     <Content Include="Scripting\Lib\bisect.py">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -919,7 +914,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Controls\WindowFrame.xaml">
+    <Page Include="Controls\WindowDecorators\OctgnDecorator_2_Frame.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -1138,6 +1133,10 @@
       <Generator>MSBuild:Compile</Generator>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Resources\Themes\Silo\Colors.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Themes\Target.xaml">
       <SubType>Designer</SubType>
