@@ -181,21 +181,21 @@ namespace Octgn.Tabs.Login
             var result = await Program.LobbyClient.Connect(Username, Password);
             switch (result)
             {
-                case Chat.Communication.Messages.Login.LoginResultType.Ok:
+                case Communication.Messages.LoginResultType.Ok:
                     return true;
-                case Chat.Communication.Messages.Login.LoginResultType.EmailUnverified:
+                case Communication.Messages.LoginResultType.EmailUnverified:
                     ErrorString = "Your e-mail hasn't been verified. Please check your e-mail. If you haven't received one, you can contact us as support@octgn.net for help.";
                     break;
-                case Chat.Communication.Messages.Login.LoginResultType.UnknownUsername:
+                case Communication.Messages.LoginResultType.UnknownUsername:
                     ErrorString = "The username/e-mail you entered doesn't exist.";
                     break;
-                case Chat.Communication.Messages.Login.LoginResultType.PasswordWrong:
+                case Communication.Messages.LoginResultType.PasswordWrong:
                     ErrorString = "The password you entered is incorrect.";
                     break;
-                case Chat.Communication.Messages.Login.LoginResultType.NotSubscribed:
+                case Communication.Messages.LoginResultType.NotSubscribed:
                     ErrorString = "You are required to subscribe on our site in order to play online.";
                     break;
-                case Chat.Communication.Messages.Login.LoginResultType.NoEmailAssociated:
+                case Communication.Messages.LoginResultType.NoEmailAssociated:
                     ErrorString = "You do not have an email associated with your account. Please visit your account page at OCTGN.net to associate an email address.";
                     break;
                 default:

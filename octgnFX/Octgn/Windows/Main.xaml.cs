@@ -25,7 +25,7 @@ using Octgn.Library;
 using Octgn.Library.Exceptions;
 using Skylabs.Lobby;
 using log4net;
-using Octgn.Chat.Communication;
+using Octgn.Communication;
 
 namespace Octgn.Windows
 {

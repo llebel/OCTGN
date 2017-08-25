@@ -15,7 +15,7 @@ using Octgn.Site.Api.Models;
 using Skylabs.Lobby;
 
 using log4net;
-using Octgn.Chat.Communication;
+using Octgn.Communication;
 
 namespace Octgn
 {

@@ -6,7 +6,10 @@ using System.Diagnostics;
 using System.Reflection;
 using log4net;
 using System.Threading.Tasks;
-using Octgn.Chat;
+using Octgn.Communication;
+using Octgn.Communication.Messages;
+using Octgn.Communication.Chat;
+using Octgn.Communication.Serializers;
 
 namespace Skylabs.Lobby
 {
@@ -18,8 +21,9 @@ namespace Skylabs.Lobby
         public string Password { get; private set; }
         public User Me { get; private set; }
         public int CurrentHostedGamePort { get; set; }
+        public Guid CurrentHostedGameId { get; set; }
         public bool IsConnected => _client.IsConnected;
-        public event Octgn.Chat.Communication.Disconnected Disconnected {
+        public event Disconnected Disconnected {
             add {
                 _client.Disconnected += value;
             }
@@ -27,7 +31,7 @@ namespace Skylabs.Lobby
                 _client.Disconnected -= value;
             }
         }
-        public event Octgn.Chat.Communication.Connected Connected {
+        public event Connected Connected {
             add {
                 _client.Connected += value;
             }
@@ -37,23 +41,23 @@ namespace Skylabs.Lobby
         }
 
         private readonly ILobbyConfig _config;
-        private readonly Octgn.Chat.Communication.Client _client;
+        private readonly Octgn.Communication.Client _client;
 
         public Client(ILobbyConfig config)
         {
             _config = config;
-            _client = new Octgn.Chat.Communication.Client(new Octgn.Chat.Communication.TcpConnection(_config.ChatHost));
-            _client.DeliverableReceived += Client_DeliverableReceived;
+            _client = new Octgn.Communication.Client(new TcpConnection(_config.ChatHost), new XmlSerializer());
+            _client.Chat().HostedGameReady += Client_HostedGameReady;
         }
 
-        public async Task<Octgn.Chat.Communication.Messages.Login.LoginResultType> Connect(string username, string password)
+        public async Task<LoginResultType> Connect(string username, string password)
         {
             Username = username;
             Password = password;
             Me = new User(Username);
             var ret = await _client.Connect(Username, Password);
 
-            if (ret != Octgn.Chat.Communication.Messages.Login.LoginResultType.Ok) {
+            if (ret != LoginResultType.Ok) {
                 Me = null;
             }
 
@@ -69,40 +73,36 @@ namespace Skylabs.Lobby
 
         public delegate void ClientDataRecieved(object sender, DataRecType type, object data);
         public event ClientDataRecieved OnDataReceived;
-        private void Client_DeliverableReceived(object sender, Octgn.Chat.Communication.DeliverableReceivedEventArgs args)
-        {
-            var deliverable = args.Deliverable;
 
-            if (deliverable is Package) {
-                var package = deliverable as Package;
-                if (package.Contents is HostedGameData) {
-                    Log.Info("Got gameready message");
-                    var game = package.Contents as HostedGameData;
+        private void Client_HostedGameReady(object sender, HostedGameReadyEventArgs e) {
+            var hostedGame = e.Game;
 
-                    this.CurrentHostedGamePort = game.Port;
-                    this.OnDataReceived?.Invoke(this, DataRecType.HostedGameReady, game);
-                }
-            }
+            Log.Info($"Got hosted game {hostedGame}");
+            var game = new HostedGameData(hostedGame);
+
+            this.CurrentHostedGamePort = game.Port;
+            this.CurrentHostedGameId = game.Id;
+            this.OnDataReceived?.Invoke(this, DataRecType.HostedGameReady, game);
         }
 
-        public async Task<HostedGameInfo> HostGame(Octgn.DataNew.Entities.Game game, string gamename,
+        public async Task<Octgn.Communication.Chat.HostedGame> HostGame(Octgn.DataNew.Entities.Game game, string gamename,
             string password, string actualgamename, string gameIconUrl, Version sasVersion, bool specators)
         {
             var request = new HostGameRequest(game.Id, game.Version, gamename, actualgamename, gameIconUrl, password ?? "", sasVersion, specators);
             Log.Info($"{request}");
 
-            var result = await _client.Request(new Package(_config.GameBotUser.UserName, request));
+            var result = await _client.Chat().RPC.HostGame(request);
+
             if (result == null)
                 throw new InvalidOperationException("Host game failed. No game data returned.");
-            return (result as Package)?.Contents as HostedGameInfo;
+
+            return result;
 
         }
 
-        public void HostedGameStarted()
+        public void HostedGameStarted(string gameId)
         {
-            var message = new Octgn.Chat.Message(_config.GameBotUser.UserName, "gamestarted");
-
-            _client.Request(message);
+            _client.Chat().RPC.SignalGameStarted(gameId).Wait();
         }
     }
 

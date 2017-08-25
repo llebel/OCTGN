@@ -5,15 +5,11 @@ using System;
 using System.Linq;
 using System.Reflection;
 using log4net;
-using Octgn.Site.Api;
-using System.Runtime.Caching;
 using System.Threading;
-using System.Timers;
 
-using Timer = System.Timers.Timer;
-using Octgn.Chat;
-using System.Threading.Tasks;
-using Octgn.Chat.Communication;
+using Octgn.Communication;
+using Octgn.Communication.Chat;
+using Octgn.Communication.Serializers;
 
 namespace Octgn.Online.GameService
 {
@@ -47,7 +43,7 @@ namespace Octgn.Online.GameService
 
         private GameBot()
         {
-            _chatClient = new Client(new TcpConnection(AppConfig.Instance.ServerPath));
+            _chatClient = new Client(new TcpConnection(AppConfig.Instance.ServerPath), new XmlSerializer());
             _chatClient.DeliverableReceived += ChatClient_DeliverableReceived;
         }
 

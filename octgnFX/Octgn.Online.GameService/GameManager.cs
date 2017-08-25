@@ -15,6 +15,7 @@ using Octgn.Site.Api.Models;
 using Skylabs.Lobby;
 using HostedGame = Skylabs.Lobby.HostedGame;
 using System.Threading.Tasks;
+using Octgn.Communication.Chat;
 
 namespace Octgn.Online.GameService
 {
@@ -69,7 +70,7 @@ namespace Octgn.Online.GameService
             }
         }
 
-        public async Task<Guid> HostGame(Chat.HostGameRequest req, User u)
+        public async Task<Guid> HostGame(HostGameRequest req, User u)
         {
             // Try to kill every other game this asshole started before this one.
             var others = GameListener.Games.Where(x => x.Username.Equals(u.UserName, StringComparison.InvariantCultureIgnoreCase))

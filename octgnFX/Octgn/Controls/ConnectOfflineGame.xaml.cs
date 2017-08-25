@@ -19,7 +19,7 @@ namespace Octgn.Controls
     using Octgn.ViewModels;
 
     using UserControl = System.Windows.Controls.UserControl;
-    using Octgn.Chat.Communication;
+    using Octgn.Communication;
 
     public partial class ConnectOfflineGame : UserControl, IDisposable
     {

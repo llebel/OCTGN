@@ -24,6 +24,7 @@ using Microsoft.Scripting.Utils;
 
 using Octgn.Core;
 using Octgn.Core.DataManagers;
+using Octgn.Communication;
 using Octgn.Library;
 using Octgn.Library.Exceptions;
 using Octgn.Networking;
@@ -37,7 +38,6 @@ namespace Octgn.Controls
 {
 
     using log4net;
-    using Octgn.Chat.Communication;
 
     /// <summary>
     /// Interaction logic for CustomGames.xaml

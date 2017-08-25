@@ -39,6 +39,10 @@ namespace Skylabs.Lobby
                 GameIconUrl = "";
         }
 
+        public HostedGameData(Octgn.Communication.Chat.HostedGame game) {
+            throw new NotImplementedException();
+        }
+
         public Guid Id { get; set; }
 
         public Guid GameGuid { get; set; }

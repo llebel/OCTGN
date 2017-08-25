@@ -80,6 +80,7 @@ namespace Octgn.Launchers
                 throw new UserMessageException("Cannot start local game. You may be missing a file.");
             }
             Program.LobbyClient.CurrentHostedGamePort = HostPort;
+            Program.LobbyClient.CurrentHostedGameId = Guid.Empty;
             Program.GameSettings.UseTwoSidedTable = HostGame.UseTwoSidedTable;
             Program.IsHost = true;
             Program.GameEngine = new GameEngine(game, Prefs.Nickname, false,password,true);

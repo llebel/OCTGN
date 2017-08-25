@@ -12,6 +12,7 @@
     using System.Windows.Controls;
     using System.Windows.Forms;
 
+    using Octgn.Communication;
     using Octgn.Core;
     using Octgn.Core.DataManagers;
     using Octgn.Library.Exceptions;
@@ -23,7 +24,6 @@
     using log4net;
 
     using UserControl = System.Windows.Controls.UserControl;
-    using Octgn.Chat.Communication;
 
     public partial class HostGameSettings : UserControl,IDisposable
     {
@@ -165,6 +165,7 @@
                         throw new Exception("Could not start game.");
                     var game = this.Game;
                     Program.LobbyClient.CurrentHostedGamePort = (int)gameData.Port;
+                    Program.LobbyClient.CurrentHostedGameId = gameData.Id;
                     //Program.GameSettings.UseTwoSidedTable = true;
                     Program.GameEngine = new GameEngine(game,Program.LobbyClient.Me.UserName,false,this.Password);
                     Program.IsHost = true;
@@ -243,13 +244,14 @@
             var hostport = new Random().Next(5000,6000);
             while (!Networking.IsPortAvailable(hostport)) hostport++;
             var hs = new HostedGame(hostport, game.Id, game.Version, game.Name,game.IconUrl, name
-                , Password, new User(Username),Specators, true);
+                , Password, new Skylabs.Lobby.User(Username),Specators, true);
             if (!hs.StartProcess())
             {
                 throw new UserMessageException("Cannot start local game. You may be missing a file.");
             }
             Prefs.Nickname = Username;
             Program.LobbyClient.CurrentHostedGamePort = hostport;
+            Program.LobbyClient.CurrentHostedGameId = hs.Id;
             Program.GameEngine = new GameEngine(game, Username, false, password, true);
 //            Program.GameSettings.UseTwoSidedTable = true;
             Program.CurrentOnlineGameName = name;
@@ -293,6 +295,7 @@
                 throw new InvalidOperationException("HostGame returned a null");
 
             Program.LobbyClient.CurrentHostedGamePort = (int)result.Port;
+            Program.LobbyClient.CurrentHostedGameId = result.Id;
             //Program.GameSettings.UseTwoSidedTable = true;
             Program.GameEngine = new GameEngine(game, Program.LobbyClient.Me.UserName, false, this.Password);
             Program.IsHost = true;

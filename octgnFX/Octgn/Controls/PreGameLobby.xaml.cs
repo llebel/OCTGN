@@ -231,7 +231,7 @@ namespace Octgn.Controls
         {
             this.IsEnabled = false;
             if (!_isLocal)
-                Program.LobbyClient.HostedGameStarted();
+                Program.LobbyClient.HostedGameStarted(Program.LobbyClient.CurrentHostedGameId.ToString());
             e.Handled = true;
             Start();
         }
