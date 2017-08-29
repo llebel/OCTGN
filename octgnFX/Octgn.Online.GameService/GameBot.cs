@@ -44,7 +44,7 @@ namespace Octgn.Online.GameService
         private GameBot()
         {
             _chatClient = new Client(new TcpConnection(AppConfig.Instance.ServerPath), new XmlSerializer());
-            _chatClient.DeliverableReceived += ChatClient_DeliverableReceived;
+            _chatClient.RequestReceived += ChatClient_RequestReceived;
         }
 
         public void Start()
@@ -52,53 +52,46 @@ namespace Octgn.Online.GameService
             _chatClient.Connect(AppConfig.Instance.XmppUsername, AppConfig.Instance.XmppPassword);
         }
 
-        private void ChatClient_DeliverableReceived(object sender, DeliverableReceivedEventArgs args)
+        private void ChatClient_RequestReceived(object sender, RequestReceivedEventArgs args)
         {
             try {
-                if (args.Deliverable is Package) {
-                    var package = args.Deliverable as Package;
+                var hostGameRequest = HostGameRequest.GetFromPacket(args.Request);
+                if (hostGameRequest == null) return;
 
-                    if (package.Contents is HostGameRequest) {
-                        var req = package.Contents as HostGameRequest;
-
-                        Log.InfoFormat("Host game from {0}", args.Deliverable.From);
-                        var endTime = DateTime.Now.AddSeconds(10);
-                        while (SasUpdater.Instance.IsUpdating) {
-                            Thread.Sleep(100);
-                            if (endTime > DateTime.Now) throw new Exception("Couldn't host, sas is updating");
-                        }
-                        var id = GameManager.Instance.HostGame(req, new Skylabs.Lobby.User(args.Deliverable.From)).Result;
-                        var game = GameManager.Instance.Games.FirstOrDefault(x => x.Id == id);
-
-                        HostedGameInfo gameInfo = new HostedGameInfo {
-                            GameGuid = game.GameGuid,
-                            GameIconUrl = game.GameIconUrl,
-                            GameName = game.GameName,
-                            GameStatus = game.GameStatus.ToString(),
-                            GameVersion = game.GameVersion,
-                            HasPassword = game.HasPassword,
-                            Id =game.Id,
-                            IpAddress = game.IpAddress.ToString(),
-                            Name = game.Name,
-                            Port = game.Port,
-                            Source = game.Source.ToString(),
-                            Spectator = game.Spectator,
-                            TimeStarted = game.TimeStarted,
-                            UserIconUrl = game.UserIconUrl,
-                            Username = game.Username
-                        };
-
-                        if (id == Guid.Empty) throw new InvalidOperationException("id == Guid.Empty");
-
-                        if (id != Guid.Empty) {
-                            args.Response = new Package(args.Deliverable.From, gameInfo);
-                        }
-                        return;
-                    }
+                Log.InfoFormat("Host game from {0}", args.Request.Origin);
+                var endTime = DateTime.Now.AddSeconds(10);
+                while (SasUpdater.Instance.IsUpdating) {
+                    Thread.Sleep(100);
+                    if (endTime > DateTime.Now) throw new Exception("Couldn't host, sas is updating");
                 }
-                Log.Warn($"Deliverable not handled. {args.Deliverable.ToString()}");
+                var id = GameManager.Instance.HostGame(hostGameRequest, new Skylabs.Lobby.User(args.Request.Origin)).Result;
+                var game = GameManager.Instance.Games.FirstOrDefault(x => x.Id == id);
+
+                HostedGame gameInfo = new HostedGame {
+                    GameGuid = game.GameGuid,
+                    GameIconUrl = game.GameIconUrl,
+                    GameName = game.GameName,
+                    GameStatus = game.GameStatus.ToString(),
+                    GameVersion = game.GameVersion,
+                    HasPassword = game.HasPassword,
+                    Id =game.Id,
+                    IpAddress = game.IpAddress.ToString(),
+                    Name = game.Name,
+                    Port = game.Port,
+                    Source = game.Source.ToString(),
+                    Spectator = game.Spectator,
+                    TimeStarted = game.TimeStarted,
+                    UserIconUrl = game.UserIconUrl,
+                    Username = game.Username
+                };
+
+                if (id == Guid.Empty) throw new InvalidOperationException("id == Guid.Empty");
+
+                if (id != Guid.Empty) {
+                    args.Response = new Communication.Packets.ResponsePacket(args.Request, gameInfo);
+                }
             } catch (Exception ex) {
-                Log.Error("[Bot]XmppOnOnMessage Error", ex);
+                Log.Error(nameof(ChatClient_RequestReceived), ex);
             }
         }
 
