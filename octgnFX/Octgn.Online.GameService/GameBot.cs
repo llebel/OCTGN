@@ -44,6 +44,7 @@ namespace Octgn.Online.GameService
         private GameBot()
         {
             _chatClient = new Client(new TcpConnection(AppConfig.Instance.ServerPath), new XmlSerializer());
+            _chatClient.InitializeChat();
             _chatClient.RequestReceived += ChatClient_RequestReceived;
         }
 
