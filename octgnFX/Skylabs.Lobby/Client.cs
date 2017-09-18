@@ -47,6 +47,7 @@ namespace Skylabs.Lobby
         {
             _config = config;
             _client = new Octgn.Communication.Client(new TcpConnection(_config.ChatHost), new XmlSerializer());
+            _client.InitializeChat();
             _client.Chat().HostedGameReady += Client_HostedGameReady;
         }
 
